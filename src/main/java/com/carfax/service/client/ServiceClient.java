@@ -56,20 +56,19 @@ public class ServiceClient {
 				HttpEntity responseEntity = response.getEntity();
 				String responseString = EntityUtils.toString(responseEntity, "UTF-8");
 
-				System.out.println("[" + statusCode + "] " + responseString);
+				logger.info(responseString);
 
 			} catch (ClientProtocolException e) {
-				logger.error(e.getMessage());
+				logger.error("Exception in makeing connection to service", e);
 			} catch (IOException e) {
-				logger.error(e.getMessage());
+				logger.error("Excetion in uploading file", e);
 			} finally {
 				try {
 					if (fileInputStream != null) {
 						fileInputStream.close();
 					}
 				} catch (IOException e) {
-					logger.error("Issue in closing the file");
-					logger.error(e.getMessage());
+					logger.error("Issue in closing the file", e);
 				}
 			}
 		}
