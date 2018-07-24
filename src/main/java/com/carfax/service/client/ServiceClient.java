@@ -39,37 +39,42 @@ public class ServiceClient {
 		} else {
 			String url = args[1] + "/uploadFile";
 			File inputFile = new File(args[0]);
-			FileInputStream fileInputStream = null;
-			try {
-				fileInputStream = new FileInputStream(inputFile);
-				HttpClient httpclient = HttpClientBuilder.create().build();
-
-				HttpPost httppost = new HttpPost(url);
-				MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-
-				builder.addPart("file", new InputStreamBody(fileInputStream, inputFile.getName()));
-				httppost.setEntity(builder.build());
-				// invoke the service with given input file
-				HttpResponse response = httpclient.execute(httppost);
-
-				int statusCode = response.getStatusLine().getStatusCode();
-				HttpEntity responseEntity = response.getEntity();
-				String responseString = EntityUtils.toString(responseEntity, "UTF-8");
-
-				logger.info(responseString);
-
-			} catch (ClientProtocolException e) {
-				logger.error("Exception in makeing connection to service", e);
-			} catch (IOException e) {
-				logger.error("Excetion in uploading file", e);
-			} finally {
+			if (!inputFile.isDirectory() && inputFile.isFile()) {
+				FileInputStream fileInputStream = null;
 				try {
-					if (fileInputStream != null) {
-						fileInputStream.close();
-					}
+					fileInputStream = new FileInputStream(inputFile);
+					HttpClient httpclient = HttpClientBuilder.create().build();
+
+					HttpPost httppost = new HttpPost(url);
+					MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+
+					builder.addPart("file", new InputStreamBody(fileInputStream, inputFile.getName()));
+					httppost.setEntity(builder.build());
+					// invoke the service with given input file
+					HttpResponse response = httpclient.execute(httppost);
+
+					int statusCode = response.getStatusLine().getStatusCode();
+					HttpEntity responseEntity = response.getEntity();
+					String responseString = EntityUtils.toString(responseEntity, "UTF-8");
+
+					logger.info(responseString);
+
+				} catch (ClientProtocolException e) {
+					logger.error("Exception in makeing connection to service", e);
 				} catch (IOException e) {
-					logger.error("Issue in closing the file", e);
+					logger.error("Excetion in uploading file", e);
+				} finally {
+					try {
+						if (fileInputStream != null) {
+							fileInputStream.close();
+						}
+					} catch (IOException e) {
+						logger.error("Issue in closing the file", e);
+					}
 				}
+
+			} else {
+				logger.info("Please enter a valid file path");
 			}
 		}
 	}
